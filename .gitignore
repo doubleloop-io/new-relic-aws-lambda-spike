@@ -1,0 +1,13 @@
+.env*
+*.log
+
+# IDE and Editors
+.idea/
+.vscode/
+
+node_modules
+
+# Build directory
+.build
+.serverless
+.esbuild

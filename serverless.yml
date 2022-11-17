@@ -1,0 +1,71 @@
+service: new-relic-aws-lambda
+
+plugins:
+    - serverless-esbuild
+    - serverless-newrelic-lambda-layers
+
+package:
+    individually: true
+
+provider:
+    name: aws
+    runtime: nodejs14.x
+    timeout: 20
+    apiGateway:
+        shouldStartNameWithService: true
+    iam:
+        role:
+            statements:
+                - Effect: "Allow"
+                  Action:
+                      - "lambda:InvokeFunction"
+                  Resource: !Sub "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:${self:service}-${self:custom.stage}-*"
+                - Effect: "Allow"
+                  Action:
+                      - "events:PutEvents"
+                  Resource: !Sub "arn:aws:events:${AWS::Region}:${AWS::AccountId}:event-bus/${self:custom.eventBusName}"
+    environment:
+        STAGE: ${self:custom.stage}
+        EVENT_BUS_NAME: ${self:custom.eventBusName}
+
+functions:
+    validateCheckoutHandler:
+        handler: src/handlers/validate-checkout-handler.handler
+        events:
+            - http:
+                  path: validate-checkout
+                  method: post
+    startCheckoutHandler:
+        handler: src/handlers/start-checkout-handler.handler
+        timeout: 65
+        events:
+            - eventBridge:
+                  eventBus: ${self:custom.eventBusName}
+                  pattern:
+                      source:
+                          - new-relic-aws-lambda-src
+                      detail-type:
+                          - checkoutProcessValidated
+
+custom:
+    apiGatewayCaching:
+        enabled: true
+    esbuild:
+        packager: npm
+        watch:
+            pattern: ["src/**/*.ts"]
+            ignore: [".serverless/**/*", ".build"] # default ['.build', 'dist', 'node_modules']
+        sourcemap: true
+        keepNames: true
+        treeShaking: true
+        bundle: true
+        minify: false
+    prune:
+        automatic: true
+        number: 3
+    stage: "dev"
+    eventBusName: ${env:EVENT_BUS_NAME, "new-relic-aws-lambda-event-bus-${self:custom.stage}"}
+    newRelic:
+        accountId: ${env:NEW_RELIC_ACCOUNT_ID}
+        apiKey: ${env:NEW_RELIC_API_KEY}
+        enableFunctionLogs: true

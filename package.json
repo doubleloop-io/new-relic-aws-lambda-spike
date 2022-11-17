@@ -1,0 +1,33 @@
+{
+    "name": "new-relic-aws-lambda",
+    "version": "0.0.1",
+    "author": "doubleloop.io",
+    "description": "Spike on aws lambda with new relic",
+    "license": "ISC",
+    "scripts": {
+        "build": "scripty",
+        "deploy": "scripty",
+        "lint": "eslint --ext ts src",
+        "lintfix": "npm run lint -- --fix",
+        "typecheck": "tsc --noEmit",
+        "typecheck:w": "tsc --noEmit --watch"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@types/node": "16.11.65",
+        "@typescript-eslint/eslint-plugin": "5.40.0",
+        "@typescript-eslint/parser": "5.40.0",
+        "eslint": "8.25.0",
+        "prettier": "2.7.1",
+        "eslint-config-prettier": "8.5.0",
+        "eslint-plugin-prettier": "4.2.1",
+        "scripty": "^2.1.1",
+        "esbuild": "0.15.10",
+        "typescript": "4.8.4",
+        "serverless": "3.22.0",
+        "serverless-esbuild": "1.32.8",
+        "serverless-newrelic-lambda-layers": "3.3.7",
+        "aws-sdk": "2.1234.0",
+        "@types/aws-lambda": "8.10.107"
+    }
+}
